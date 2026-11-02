@@ -31,6 +31,7 @@ also grounded, efficient and honest about their uncertainty.
 
 | Project | Area | Description |
 |---|---|---|
+| [**Structura**](https://github.com/dangaura-tech/structura) | 3D Vision · Reconstruction | Incremental structure-from-motion and point-cloud processing (bundle adjustment, ICP, COLMAP export) from first principles |
 | [**OccTrack**](https://github.com/dangaura-tech/occtrack) | Video Understanding · Tracking | Occlusion-aware multi-object tracking with camera-motion compensation, Re-ID memory and HOTA evaluation |
 | [**BAU-Net**](https://github.com/dangaura-tech/bau-net) | Dense Prediction · Uncertainty | Boundary- and uncertainty-aware segmentation with a transformer bottleneck and uncertainty-guided point refinement (medical imaging) |
 
