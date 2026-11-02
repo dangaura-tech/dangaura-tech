@@ -109,19 +109,28 @@ def streaks(days: list[tuple[str, int]]) -> tuple[int, int]:
     return current, longest
 
 
-def scrape_achievements(user: str) -> list[str]:
-    """GitHub has no API for achievements; read the public achievements tab instead."""
+ACHIEVEMENT_IMG = re.compile(
+    r"(https://github\.githubassets\.com/[^\"'\s]*?/([a-z0-9]+(?:-[a-z0-9]+)*?)-default(?:-[0-9a-f]{6,})?\.png)"
+)
+
+
+def scrape_achievements(user: str) -> list[dict]:
+    """GitHub has no API for achievements, so read the public achievements tab.
+
+    Returns ``[{"slug": ..., "image": url}]`` in page order, de-duplicated. Badge images are
+    served either as ``.../achievements/<slug>-default.png`` or as hashed asset names
+    ``.../assets/<slug>-default-<hash>.png``; both forms are recognised.
+    """
     try:
         req = urllib.request.Request(f"https://github.com/{user}?tab=achievements", headers={"User-Agent": "Mozilla/5.0"})
         page = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace")
-    except (urllib.error.URLError, TimeoutError):
+    except (urllib.error.URLError, TimeoutError) as exc:
+        print(f"warning: achievements page unavailable: {exc}", file=sys.stderr)
         return []
-    slugs = re.findall(r"/achievements/([a-z0-9-]+)-default\.png", page)
-    seen: list[str] = []
-    for s in slugs:
-        if s not in seen:
-            seen.append(s)
-    return seen
+    found: dict[str, str] = {}
+    for url, slug in ACHIEVEMENT_IMG.findall(page):
+        found.setdefault(slug, url)
+    return [{"slug": k, "image": v} for k, v in found.items()]
 
 
 def fetch(user: str, token: str | None) -> dict:
@@ -172,7 +181,7 @@ MOCK = {
     "user": "dangaura-tech", "stars": 3, "forks": 1, "repos": 6, "commits": 87, "prs": 4, "merged_prs": 3,
     "issues": 2, "contributions": 112, "current_streak": 5, "longest_streak": 9,
     "languages": {"Python": 410000, "Go": 95000, "TypeScript": 30000, "Solidity": 21000, "Shell": 4000},
-    "achievements": ["pull-shark", "yolo", "quickdraw"],
+    "achievements": [{"slug": s, "image": ""} for s in ("pull-shark", "yolo", "quickdraw")],
 }  # fmt: skip
 
 
@@ -256,8 +265,9 @@ def render_languages(d: dict, top: int = 6) -> str:
     return _frame(470, 100 + 28 * ((len(langs) + 1) // 2), "Most used languages", body)
 
 
-def _badge_image(slug: str) -> str | None:
-    url = f"https://github.githubassets.com/images/modules/profile/achievements/{slug}-default.png"
+def _badge_image(url: str) -> str | None:
+    if not url:
+        return None
     try:
         data = urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}), timeout=30).read()
     except (urllib.error.URLError, TimeoutError):
@@ -266,14 +276,15 @@ def _badge_image(slug: str) -> str | None:
 
 
 def render_achievements(d: dict, embed: bool = True) -> str:
-    slugs = d["achievements"]
-    if not slugs:
+    badges = d["achievements"]
+    if not badges:
         body = '<text x="25" y="80" class="muted">Achievements will appear here as they are unlocked.</text>'
         return _frame(470, 110, "GitHub achievements", body)
     items = []
-    for i, slug in enumerate(slugs[:6]):
+    for i, badge in enumerate(badges[:6]):
+        slug = badge["slug"]
         x = 25 + i * 72
-        img = _badge_image(slug) if embed else None
+        img = _badge_image(badge["image"]) if embed else None
         if img:
             pic = f'<image x="{x}" y="52" width="60" height="60" xlink:href="{img}" href="{img}"/>'
         else:
