@@ -142,15 +142,18 @@ def fetch(user: str, token: str | None) -> dict:
             continue
         for lang, size in gh.get(f"/repos/{user}/{r['name']}/languages").items():
             langs[lang] += size
-    try:
-        commits = gh._request(
-            f"{API}/search/commits?q=author:{user}&per_page=1", accept="application/vnd.github.cloak-preview+json"
-        )["total_count"]
-    except urllib.error.HTTPError:
-        commits = 0
-    prs = gh.get(f"/search/issues?q=author:{user}+type:pr&per_page=1")["total_count"]
-    merged = gh.get(f"/search/issues?q=author:{user}+type:pr+is:merged&per_page=1")["total_count"]
-    issues = gh.get(f"/search/issues?q=author:{user}+type:issue&per_page=1")["total_count"]
+    def search_count(path: str, accept: str = "application/vnd.github+json") -> int | None:
+        """Search API totals; ``None`` when GitHub refuses the query (e.g. 422 for private profiles)."""
+        try:
+            return int(gh._request(f"{API}{path}", accept=accept)["total_count"])
+        except urllib.error.HTTPError as exc:
+            print(f"warning: {path} -> HTTP {exc.code}", file=sys.stderr)
+            return None
+
+    commits = search_count(f"/search/commits?q=author:{user}&per_page=1", "application/vnd.github.cloak-preview+json")
+    prs = search_count(f"/search/issues?q=author:{user}+type:pr&per_page=1")
+    merged = search_count(f"/search/issues?q=author:{user}+type:pr+is:merged&per_page=1")
+    issues = search_count(f"/search/issues?q=author:{user}+type:issue&per_page=1")
     total_contrib, current, longest = None, 0, 0
     try:
         cal = gh.graphql(CALENDAR_QUERY, {"login": user})["data"]["user"]["contributionsCollection"]
@@ -215,7 +218,7 @@ def render_stats(d: dict) -> str:
     rows = [
         ("★", "Total stars", d["stars"]),
         ("⎇", "Commits", d["commits"]),
-        ("⇄", "Pull requests (merged)", f"{d['prs']} ({d['merged_prs']})"),
+        ("⇄", "Pull requests (merged)", f"{_fmt(d['prs'])} ({_fmt(d['merged_prs'])})"),
         ("!", "Issues", d["issues"]),
         ("▣", "Public repositories", d["repos"]),
         ("◆", "Contributions this year", d["contributions"]),
@@ -227,7 +230,7 @@ def render_stats(d: dict) -> str:
             f'<g class="fade" style="animation-delay:{150 + i * 120}ms">'
             f'<text x="25" y="{y}" class="label" fill="{THEME["icon"]}" style="fill:{THEME["icon"]}">{icon}</text>'
             f'<text x="48" y="{y}" class="label">{html.escape(label)}:</text>'
-            f'<text x="240" y="{y}" class="value">{html.escape(_fmt(value) if isinstance(value, int) else str(value))}</text></g>'
+            f'<text x="240" y="{y}" class="value">{html.escape(value if isinstance(value, str) else _fmt(value))}</text></g>'
         )
     cx, cy = 385, 125
     body.append(
