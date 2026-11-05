@@ -313,11 +313,36 @@ Smart-contract infrastructure featuring ERC-20 governance, reward-streaming stak
 ---
 
 <a id="connect"></a>
+<div align="center">
 
+<a href="https://github.com/dangaura-tech">
+  <img src="https://raw.githubusercontent.com/dangaura-tech/dangaura-tech/cards/stats.svg"
+       width="49%" alt="GitHub statistics"/>
+</a>
+<a href="https://raw.githubusercontent.com/dangaura-tech/dangaura-tech/cards/languages.svg">
+  <img src="https://raw.githubusercontent.com/dangaura-tech/dangaura-tech/cards/languages.svg"
+       width="49%" alt="Most used languages"/>
+</a>
+
+</div>
 ## 🤝 Let's Connect
 
 I'm always interested in discussing research, collaborating on interesting AI problems and building useful systems.
-
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="https://raw.githubusercontent.com/dangaura-tech/dangaura-tech/output/github-contribution-grid-snake-dark.svg"
+  />
+  <source
+    media="(prefers-color-scheme: light)"
+    srcset="https://raw.githubusercontent.com/dangaura-tech/dangaura-tech/output/github-contribution-grid-snake.svg"
+  />
+  <img
+    src="https://raw.githubusercontent.com/dangaura-tech/dangaura-tech/output/github-contribution-grid-snake.svg"
+    width="100%"
+    alt="GitHub contribution snake"
+  />
+</picture>
 <div align="center">
 
 <a href="mailto:dang.le@mbzuai.ac.ae">
