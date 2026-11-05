@@ -35,6 +35,7 @@ also grounded, efficient and honest about their uncertainty.
 | [**OccTrack**](https://github.com/dangaura-tech/occtrack) | Video Understanding · Tracking | Occlusion-aware multi-object tracking with camera-motion compensation, Re-ID memory and HOTA evaluation |
 | [**BAU-Net**](https://github.com/dangaura-tech/bau-net) | Dense Prediction · Uncertainty | Boundary- and uncertainty-aware segmentation with a transformer bottleneck and uncertainty-guided point refinement (medical imaging) |
 | [**CXR-Trust**](https://github.com/dangaura-tech/cxr-trust) | Trustworthy Recognition | Calibrated, explainable multi-label image classification (Grad-CAM++, temperature scaling) on chest X-rays |
+| [**ChainVault**](https://github.com/dangaura-tech/chainvault) | Blockchain · Solidity | ERC-20 governance token, reward-streaming staking vault and token vesting |
 
 ---
 
