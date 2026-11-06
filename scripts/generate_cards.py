@@ -229,9 +229,11 @@ def render_stats(d: dict) -> str:
         ("!", "Issues", d["issues"]),
         ("▣", "Public repositories", d["repos"]),
     ]
+    if not d["stars"]:
+        rows = rows[1:]
     body = []
     for i, (icon, label, value) in enumerate(rows):
-        y = 78 + i * 30
+        y = 78 + i * 30 + (15 if len(rows) < 5 else 0)
         body.append(
             f'<g class="fade" style="animation-delay:{150 + i * 120}ms">'
             f'<text x="25" y="{y}" class="label" fill="{THEME["icon"]}" style="fill:{THEME["icon"]}">{icon}</text>'
