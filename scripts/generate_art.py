@@ -353,8 +353,8 @@ def mini_chain(cx, cy):
 
 PROJECTS = [
     dict(slug="structura", name="Structura", area="3D VISION · RECONSTRUCTION", lang=("Python", "#3572A5"),
-         lines=["Incremental structure-from-motion and", "point-cloud toolkit: robust bundle adjustment,", "ICP and open-vocabulary 3D queries."],
-         tags=[("SfM", P["cyan"]), ("Bundle Adj.", P["violet"]), ("CLIP", P["pink"])], mini=mini_structura),
+         lines=["Incremental structure-from-motion with", "self-calibrating bundle adjustment, retrieval", "and open-vocabulary 3D queries."],
+         tags=[("SfM", P["cyan"]), ("Retrieval", P["violet"]), ("CLIP", P["pink"])], mini=mini_structura),
     dict(slug="occtrack", name="OccTrack", area="VIDEO UNDERSTANDING · TRACKING", lang=("Python", "#3572A5"),
          lines=["Occlusion-aware multi-object tracking with", "camera-motion compensation, observation-", "centric re-updates and Re-ID memory."],
          tags=[("MOT", P["cyan"]), ("Kalman", P["violet"]), ("HOTA", P["pink"])], mini=mini_occtrack),
@@ -362,8 +362,8 @@ PROJECTS = [
          lines=["Boundary- and uncertainty-aware segmentation", "with a transformer bottleneck and", "uncertainty-guided point refinement."],
          tags=[("Segmentation", P["cyan"]), ("SDF loss", P["violet"]), ("ONNX", P["pink"])], mini=mini_baunet),
     dict(slug="cxr-trust", name="CXR-Trust", area="TRUSTWORTHY RECOGNITION", lang=("Python", "#3572A5"),
-         lines=["Calibrated, explainable multi-label image", "classification with Grad-CAM++ and", "temperature scaling for chest X-rays."],
-         tags=[("Calibration", P["cyan"]), ("Grad-CAM++", P["violet"]), ("XAI", P["pink"])], mini=mini_cxr),
+         lines=["Calibrated, explainable chest X-ray", "classification with conformal guarantees,", "Grad-CAM++ and a zero-shot VLM baseline."],
+         tags=[("Conformal", P["cyan"]), ("Grad-CAM++", P["violet"]), ("BiomedCLIP", P["pink"])], mini=mini_cxr),
     dict(slug="chainvault", name="ChainVault", area="BLOCKCHAIN · SOLIDITY", lang=("Solidity", "#AA6746"), wide=True,
          lines=["ERC-20 governance token, reward-streaming staking vault and token vesting,", "governed on-chain through an OpenZeppelin Governor behind a timelock."],
          tags=[("Solidity", P["cyan"]), ("Hardhat", P["violet"]), ("Governor", P["pink"]), ("ERC20Votes", P["amber"])], mini=mini_chain),
