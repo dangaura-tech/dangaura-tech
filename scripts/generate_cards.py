@@ -23,16 +23,19 @@ import urllib.request
 from collections import Counter
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from svgart import Orbit, fibonacci_sphere, orbit_cloud  # noqa: E402
+
 API = "https://api.github.com"
 
 THEME = {
-    "bg": "#1a1b27",
-    "border": "#2a2e45",
-    "title": "#70a5fd",
-    "text": "#c0caf5",
-    "muted": "#7f88b0",
-    "accent": "#bf91f3",
-    "icon": "#38bdae",
+    "bg": "#0f1326",
+    "border": "#262b4d",
+    "title": "#e6e8ff",
+    "text": "#c9cdf0",
+    "muted": "#7a81ab",
+    "accent": "#8b7cff",
+    "icon": "#22d3ee",
 }
 
 # GitHub linguist colours for the languages we are likely to show.
@@ -42,6 +45,9 @@ LANG_COLORS = {
     "Jupyter Notebook": "#DA5B0B", "Dockerfile": "#384d54", "Makefile": "#427819", "HTML": "#e34c26",
     "CSS": "#563d7c", "Cuda": "#3A4E3A", "TeX": "#3D6117",
 }  # fmt: skip
+
+# Markup / bibliography files from paper write-ups are not "languages" in a meaningful sense.
+IGNORED_LANGUAGES = {"BibTeX Style", "TeX", "HTML", "CSS", "Makefile", "Dockerfile"}
 
 ACHIEVEMENT_NAMES = {
     "pull-shark": "Pull Shark", "yolo": "YOLO", "quickdraw": "Quickdraw", "starstruck": "Starstruck",
@@ -141,7 +147,8 @@ def fetch(user: str, token: str | None) -> dict:
         if r["name"] == user:  # the profile repo itself is not a project
             continue
         for lang, size in gh.get(f"/repos/{user}/{r['name']}/languages").items():
-            langs[lang] += size
+            if lang not in IGNORED_LANGUAGES:
+                langs[lang] += size
     def search_count(path: str, accept: str = "application/vnd.github+json") -> int | None:
         """Search API totals; ``None`` when GitHub refuses the query (e.g. 422 for private profiles)."""
         try:
@@ -221,27 +228,18 @@ def render_stats(d: dict) -> str:
         ("⇄", "Pull requests (merged)", f"{_fmt(d['prs'])} ({_fmt(d['merged_prs'])})"),
         ("!", "Issues", d["issues"]),
         ("▣", "Public repositories", d["repos"]),
-        ("◆", "Contributions this year", d["contributions"]),
     ]
     body = []
     for i, (icon, label, value) in enumerate(rows):
-        y = 70 + i * 27
+        y = 78 + i * 30
         body.append(
             f'<g class="fade" style="animation-delay:{150 + i * 120}ms">'
             f'<text x="25" y="{y}" class="label" fill="{THEME["icon"]}" style="fill:{THEME["icon"]}">{icon}</text>'
             f'<text x="48" y="{y}" class="label">{html.escape(label)}:</text>'
             f'<text x="240" y="{y}" class="value">{html.escape(value if isinstance(value, str) else _fmt(value))}</text></g>'
         )
-    cx, cy = 385, 125
-    body.append(
-        f'<g class="fade" style="animation-delay:300ms">'
-        f'<circle cx="{cx}" cy="{cy}" r="48" fill="none" stroke="{THEME["border"]}" stroke-width="6"/>'
-        f'<circle cx="{cx}" cy="{cy}" r="48" fill="none" stroke="{THEME["accent"]}" stroke-width="6" '
-        f'stroke-dasharray="{min(d["current_streak"], 30) / 30 * 301.6:.1f} 301.6" transform="rotate(-90 {cx} {cy})" '
-        f'stroke-linecap="round"/>'
-        f'<text x="{cx}" y="{cy + 8}" text-anchor="middle" class="big">{d["current_streak"]}</text>'
-        f'<text x="{cx}" y="{cy + 72}" text-anchor="middle" class="muted">day streak · best {d["longest_streak"]}</text></g>'
-    )
+    orbit = Orbit(cx=385, cy=128, scale=52, period=16)
+    body.append(orbit_cloud(orbit, fibonacci_sphere(140), radius=1.7))
     return _frame(470, 240, f"{d['user']}'s GitHub stats", "\n".join(body))
 
 
@@ -251,21 +249,21 @@ def render_languages(d: dict, top: int = 6) -> str:
     x, bar = 25, []
     for name, v in langs:
         w = 420 * v / total
-        bar.append(f'<rect x="{x:.1f}" y="55" width="{w:.1f}" height="10" fill="{LANG_COLORS.get(name, "#8b949e")}"/>')
+        bar.append(f'<rect x="{x:.1f}" y="60" width="{w:.1f}" height="10" fill="{LANG_COLORS.get(name, "#8b949e")}"/>')
         x += w
     items = []
     for i, (name, v) in enumerate(langs):
         col, row = i % 2, i // 2
-        px, py = 25 + col * 215, 95 + row * 28
+        px, py = 25 + col * 215, 112 + row * 40
         items.append(
             f'<g class="fade" style="animation-delay:{200 + i * 120}ms">'
             f'<circle cx="{px + 6}" cy="{py - 5}" r="6" fill="{LANG_COLORS.get(name, "#8b949e")}"/>'
             f'<text x="{px + 20}" y="{py}" class="label">{html.escape(name)}</text>'
             f'<text x="{px + 190}" y="{py}" text-anchor="end" class="muted">{100 * v / total:.1f}%</text></g>'
         )
-    clip = '<clipPath id="r"><rect x="25" y="55" width="420" height="10" rx="5"/></clipPath>'
+    clip = '<clipPath id="r"><rect x="25" y="60" width="420" height="10" rx="5"/></clipPath>'
     body = f'{clip}<g clip-path="url(#r)">{"".join(bar)}</g>' + "\n".join(items)
-    return _frame(470, 100 + 28 * ((len(langs) + 1) // 2), "Most used languages", body)
+    return _frame(470, 240, "Most used languages", body)
 
 
 def _badge_image(url: str) -> str | None:
@@ -284,9 +282,11 @@ def render_achievements(d: dict, embed: bool = True) -> str:
         body = '<text x="25" y="80" class="muted">Achievements will appear here as they are unlocked.</text>'
         return _frame(470, 110, "GitHub achievements", body)
     items = []
-    for i, badge in enumerate(badges[:6]):
+    shown = badges[:6]
+    start = (470 - 72 * len(shown) + 12) / 2
+    for i, badge in enumerate(shown):
         slug = badge["slug"]
-        x = 25 + i * 72
+        x = round(start + i * 72)
         img = _badge_image(badge["image"]) if embed else None
         if img:
             pic = f'<image x="{x}" y="52" width="60" height="60" xlink:href="{img}" href="{img}"/>'
