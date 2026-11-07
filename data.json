@@ -1,0 +1,34 @@
+{
+  "user": "dangaura-tech",
+  "stars": 0,
+  "forks": 0,
+  "repos": 7,
+  "commits": 128,
+  "prs": 6,
+  "merged_prs": 6,
+  "issues": 1,
+  "contributions": 170,
+  "current_streak": 3,
+  "longest_streak": 3,
+  "languages": {
+    "Python": 1375572,
+    "Shell": 16723,
+    "Solidity": 16572,
+    "TypeScript": 16303
+  },
+  "achievements": [
+    {
+      "slug": "pull-shark",
+      "image": "https://github.githubassets.com/assets/pull-shark-default-498c279a747d.png"
+    },
+    {
+      "slug": "yolo",
+      "image": "https://github.githubassets.com/assets/yolo-default-be0bbff04951.png"
+    },
+    {
+      "slug": "quickdraw",
+      "image": "https://github.githubassets.com/assets/quickdraw-default-39c6aec8ff89.png"
+    }
+  ],
+  "generated_at": "2026-11-07T13:30:27.562459+00:00"
+}
